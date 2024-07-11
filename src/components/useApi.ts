@@ -20,6 +20,38 @@ export const useApi = (): Api => {
   const navigate = useNavigate();
   const { getToken, clearTokens } = useTokenService();
 
+  const handleResponse = useCallback(async (response) => {
+    if (!response.ok) {
+      let errorMessage = "Network response was not ok";
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message;
+      } catch (error) {
+        console.error("Failed to parse error response body:", error);
+      }
+
+      switch (response.status) {
+        case 401:
+          clearTokens();
+          navigate('/login');
+          errorMessage = 'Unauthorized:' + errorMessage;
+          break;
+        case 404:
+          errorMessage = 'Not Found: ' + errorMessage;
+          break;
+        case 500:
+          errorMessage = 'Internal Server Error:' + errorMessage;
+          break;
+        default:
+          errorMessage = `[${response.status}] ${errorMessage}`;
+          break;
+      }
+      throw new Error(errorMessage);
+    }
+    return response.json();
+  }, [clearTokens, navigate]);
+
+
   const sendGet = useCallback(
     async <ResultType>(
       url: string,
@@ -30,20 +62,15 @@ export const useApi = (): Api => {
           url,
           addAuthorizationHeader(options || {}, getToken()),
         );
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return (await response.json()) as ResultType;
+        return handleResponse(response) as Promise<ResultType>;
       } catch (error) {
-        if (error instanceof Error && error.message === 'Unauthorized') {
-          clearTokens();
-          navigate('/login');
+        if (error instanceof Error) {
+          toast.error('Failed to fetch data: ' + error.message);
         }
-        toast.error('Failed to fetch data');
         throw error;
       }
     },
-    [getToken, clearTokens, navigate],
+    [getToken, handleResponse],
   );
 
   const sendPost = useCallback(
@@ -59,21 +86,18 @@ export const useApi = (): Api => {
           ...addJsonHeaders(options || {}),
           ...addAuthorizationHeader(options || {}, getToken()),
         });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return (await response.json()) as ResultType;
+
+        return handleResponse(response) as Promise<ResultType>;
       } catch (error) {
-        if (error instanceof Error && error.message === 'Unauthorized') {
-          clearTokens();
-          navigate('/login');
+        if (error instanceof Error) {
+          toast.error('Failed to fetch data: ' + error.message);
         }
-        toast.error('Failed to fetch data');
         throw error;
       }
     },
-    [getToken, clearTokens, navigate],
+    [getToken, handleResponse],
   );
 
   return { sendGet, sendPost };
+
 };

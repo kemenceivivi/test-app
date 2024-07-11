@@ -37,6 +37,16 @@ A letöltés után bármilyen hibába belefutsz, próbáld megoldani, és dokume
 
 **Részletek**: Az API hívások hibakezelése nem megfelelően van implementálva. Javítsd ki a hibákat, és győződj meg róla, hogy az alkalmazás megfelelően kezeli az API hívások során felmerülő hibákat. Például ellenőrizd, hogy az `Unauthorized` hiba esetén a felhasználó átirányításra kerül a bejelentkezési oldalra.
 
+A useApi.ts-ben a kód "Unauthorized" hibaüzenet alapján kezeli a 401-es hibákat. Az API hook-ok nem kezelnek más típusú hibákat, 
+mint például a hálózati hibákat vagy a szerver hibákat (Unauthorized kívül) hatékonyan.
+API válaszok mockolására a Mirage JS nevű könyvtérat használtam. Cookie-alapú autentikációt alkalmaztam.
+js-cookie könyvtárat választottam, ami lehetővé teszi a cookie-k biztonságos kezelését, HttpOnly és secure 
+beállításokkal. A Mirage JS segítségével pedig úgy konfiguráltam a szervert, hogy a sikeres bejelentkezés után állítson 
+be egy cookie-t.
+
+Az App komponenst az AuthProvider-be wrappeltem, hogy globálisan elérhetővé tegyem az autentikációs állapotot és a műveleteit,
+hogy kezeljem a privát útvonalakat, hogy bizonyos oldalak csak hitelesített felhasználók számára legyenek elérhetőek.
+
 ### 2. Bejelentkezési Felület Létrehozása
 
 **Feladat**: Hozz létre egy bejelentkezési felületet.

@@ -1,4 +1,4 @@
-export const addAuthorizationHeader = (options: RequestInit, token: string) => {
+export const addAuthorizationHeader = (options: RequestInit, token: string): RequestInit => {
     return {
         ...options,
         headers: {
@@ -8,7 +8,7 @@ export const addAuthorizationHeader = (options: RequestInit, token: string) => {
     };
 };
 
-export const addJsonHeaders = (options: RequestInit) => {
+export const addJsonHeaders = (options: RequestInit): RequestInit => {
     return {
         ...options,
         headers: {
