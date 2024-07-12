@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, FC } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  FC,
+} from 'react';
 import { useTokenService } from './useTokenService';
 
 interface AuthContextType {
@@ -9,13 +16,15 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: FC<{ children: ReactNode }> = ({ children }): JSX.Element => {
+export const AuthProvider: FC<{ children: ReactNode }> = ({
+  children,
+}): JSX.Element => {
   const { getToken, clearTokens } = useTokenService();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     const token = getToken();
-    console.log("token on load:", token);
+    console.log('token on load:', token);
     setIsAuthenticated(!!token);
   }, [getToken]);
 

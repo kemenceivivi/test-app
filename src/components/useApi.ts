@@ -20,37 +20,39 @@ export const useApi = (): Api => {
   const navigate = useNavigate();
   const { getToken, clearTokens } = useTokenService();
 
-  const handleResponse = useCallback(async (response) => {
-    if (!response.ok) {
-      let errorMessage = "Network response was not ok";
-      try {
-        const errorBody = await response.json();
-        errorMessage = errorBody.message;
-      } catch (error) {
-        console.error("Failed to parse error response body:", error);
-      }
+  const handleResponse = useCallback(
+    async (response) => {
+      if (!response.ok) {
+        let errorMessage = 'Network response was not ok';
+        try {
+          const errorBody = await response.json();
+          errorMessage = errorBody.message;
+        } catch (error) {
+          console.error('Failed to parse error response body:', error);
+        }
 
-      switch (response.status) {
-        case 401:
-          clearTokens();
-          navigate('/login');
-          errorMessage = 'Unauthorized:' + errorMessage;
-          break;
-        case 404:
-          errorMessage = 'Not Found: ' + errorMessage;
-          break;
-        case 500:
-          errorMessage = 'Internal Server Error:' + errorMessage;
-          break;
-        default:
-          errorMessage = `[${response.status}] ${errorMessage}`;
-          break;
+        switch (response.status) {
+          case 401:
+            clearTokens();
+            navigate('/login');
+            errorMessage = 'Unauthorized:' + errorMessage;
+            break;
+          case 404:
+            errorMessage = 'Not Found: ' + errorMessage;
+            break;
+          case 500:
+            errorMessage = 'Internal Server Error:' + errorMessage;
+            break;
+          default:
+            errorMessage = `[${response.status}] ${errorMessage}`;
+            break;
+        }
+        throw new Error(errorMessage);
       }
-      throw new Error(errorMessage);
-    }
-    return response.json();
-  }, [clearTokens, navigate]);
-
+      return response.json();
+    },
+    [clearTokens, navigate],
+  );
 
   const sendGet = useCallback(
     async <ResultType>(
@@ -99,5 +101,4 @@ export const useApi = (): Api => {
   );
 
   return { sendGet, sendPost };
-
 };
