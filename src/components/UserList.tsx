@@ -1,62 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { toast } from 'react-toastify';
-import { useApi } from './useApi';
 import { useAuth } from './AuthContext';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import { Box } from '@mui/material';
+import CustomButton from './StyledButton';
 
 export interface User {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
 }
 
+const users: User[] = [
+  { id: 1, name: 'John Doe' },
+  { id: 2, name: 'Jane Smith' },
+  { id: 3, name: 'Alice Johnson' },
+  { id: 4, name: 'Robert Brown' },
+];
+
 const UserList: React.FC = () => {
-    const [users, setUsers] = useState<User[]>([]);
-    const [filter, setFilter] = useState('');
-    const { sendGet } = useApi();
-    const { logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const fetchedUsers = await sendGet<User[]>('/api/users');
-                console.log('in userlist: ',fetchedUsers);
-                setUsers(fetchedUsers);
-            } catch (error) {
-                if (error instanceof Error) {
-                    console.error('Failed to fetch users', error.message);
-                    toast.error('Failed to load users: ' + error.message);
-                }
-            }
-        };
+  const handleLogout = () => {
+    logout();
+    toast.info('You have been logged out.');
+  };
 
-        fetchUsers();
-    }, [sendGet]);
-
-    const handleLogout = () => {
-        logout();
-        toast.info('You have been logged out.');
-    };
-
-    const filteredUsers = users.filter(user =>
-      user.name.toLowerCase().includes(filter.toLowerCase())
-    );
-
-    return (
-      <div>
-          <input
-            type="text"
-            placeholder="Szűrés név szerint..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          />
-          <ul>
-              {filteredUsers.map(user => (
-                <li key={user.id}>{user.name}</li>
-              ))}
-          </ul>
-
-          <button onClick={handleLogout}>Logout</button>
-      </div>
-    );
+  return isAuthenticated ? (
+    <Box display={'flex'} flexDirection={'column'} gap={2}>
+      <Autocomplete
+        id="searchfield"
+        options={users}
+        getOptionLabel={(option) => option.name}
+        renderInput={(params) => (
+          <TextField {...params} label="Search users" variant="filled" />
+        )}
+        sx={{ width: 300, bgcolor: 'background.paper' }}
+      />
+      <CustomButton onClick={handleLogout}>Logout</CustomButton>
+    </Box>
+  ) : null;
 };
 
 export default UserList;

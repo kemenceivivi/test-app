@@ -13,10 +13,14 @@ createServer({
       if (username === 'admin' && password === 'password') {
         return {
           user: { id: 1, name: 'Admin' },
-          token: 'fake-jwt-token'
+          token: 'fake-jwt-token',
         };
       } else {
-        return new Response(401, {}, { error: 'Helytelen felhasználónév vagy jelszó' });
+        return new Response(
+          401,
+          {},
+          { error: 'Helytelen felhasználónév vagy jelszó' },
+        );
       }
     });
 
@@ -25,20 +29,20 @@ createServer({
     });
 
     this.get('/users', (schema, request) => {
-
       const authHeader = request.requestHeaders['Authorization'];
 
       if (authHeader === 'Bearer fake-jwt-token') {
-        return [{ id: 1, name: 'John Doe' },
+        return [
+          { id: 1, name: 'John Doe' },
           { id: 2, name: 'Jane Smith' },
           { id: 3, name: 'Alice Johnson' },
-          { id: 4, name: 'Robert Brown' }];
+          { id: 4, name: 'Robert Brown' },
+        ];
       } else {
         return new Response(401, {}, { error: 'not authorized' });
       }
     });
-
-  }
+  },
 });
 
 ReactDOM.render(
@@ -47,5 +51,5 @@ ReactDOM.render(
       <App />
     </AuthProvider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
