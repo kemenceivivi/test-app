@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { addAuthorizationHeader, addJsonHeaders } from './apiHelper';
+import { addAuthorizationHeader, addJsonHeaders } from '../utility/apiHelper';
 import { useTokenService } from './useTokenService';
 
 interface Api {

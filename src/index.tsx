@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { createServer, Response } from 'miragejs';
 import App from './App';
 import './index.css';
-import { AuthProvider } from './components/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
 createServer({
   routes() {
@@ -16,11 +16,7 @@ createServer({
           token: 'fake-jwt-token',
         };
       } else {
-        return new Response(
-          401,
-          {},
-          { error: 'Helytelen felhasználónév vagy jelszó' },
-        );
+        return new Response(401, {}, { error: 'Wrong username or password' });
       }
     });
 

@@ -6,7 +6,7 @@ import React, {
   ReactNode,
   FC,
 } from 'react';
-import { useTokenService } from './useTokenService';
+import { useTokenService } from '../hooks/useTokenService';
 
 interface AuthContextType {
   isAuthenticated: boolean;

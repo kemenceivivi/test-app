@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
-import { useTokenService } from './useTokenService';
-import { useApi } from './useApi';
+import { useAuth } from '../context/AuthContext';
+import { useTokenService } from '../hooks/useTokenService';
+import { useApi } from '../hooks/useApi';
 import { toast } from 'react-toastify';
 import { Box, TextField, Button } from '@mui/material';
 import { Formik, Form, FormikHelpers } from 'formik';
