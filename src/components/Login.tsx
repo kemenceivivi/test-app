@@ -1,16 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTokenService } from './useTokenService';
 import { useApi } from './useApi';
 import { toast } from 'react-toastify';
-import { Box } from '@mui/material';
-import TextField from '@mui/material/TextField';
-import CustomButton from './StyledButton';
+import { Box, TextField, Button } from '@mui/material';
+import { Formik, Form, FormikHelpers } from 'formik';
+import * as Yup from 'yup';
+
+interface LoginFormValues {
+  username: string;
+  password: string;
+}
+
+interface LoginResponse {
+  token: string;
+  user: {
+    id: number;
+    name: string;
+  };
+}
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const { isAuthenticated, login } = useAuth();
   const { setToken } = useTokenService();
@@ -22,52 +33,82 @@ const Login: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleLogin = async () => {
+  const initialValues: LoginFormValues = {
+    username: '',
+    password: '',
+  };
+
+  const validationSchema = Yup.object({
+    username: Yup.string().required('Username is required'),
+    password: Yup.string().required('Password is required'),
+  });
+
+  const handleLogin = async (
+    values: LoginFormValues,
+    { setSubmitting }: FormikHelpers<LoginFormValues>,
+  ) => {
     try {
-      const data = await sendPost<
-        { username: string; password: string },
-        { token: string; user: { id: number; name: string } }
-      >('/api/login', { username, password });
+      const data = await sendPost<LoginFormValues, LoginResponse>(
+        '/api/login',
+        values,
+      );
       setToken(data.token);
-      console.log(data);
       login();
       navigate('/');
     } catch (error) {
       if (error instanceof Error) {
-        console.log('error:', error);
         toast.error(error.message);
       } else {
+        toast.error('An unexpected error occurred');
       }
+      setSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <Box display={'flex'} flexDirection={'column'} gap={2}>
-        <TextField
-          id="username"
-          label="Username"
-          variant="filled"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          sx={{ width: 300, bgcolor: 'background.paper' }}
-        />
-
-        <TextField
-          id="password"
-          label="Password"
-          variant="filled"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          sx={{ width: 300, bgcolor: 'background.paper' }}
-        />
-
-        <CustomButton onClick={handleLogin}>Login</CustomButton>
-      </Box>
-    </div>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleLogin}
+    >
+      {({ errors, touched, isSubmitting, handleChange, handleBlur }) => (
+        <Form>
+          <Box
+            display="flex"
+            flexDirection="column"
+            gap={2}
+            width={300}
+            sx={{ bgcolor: 'white' }}
+            p={3}
+          >
+            <TextField
+              name="username"
+              label="Username"
+              variant="filled"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.username && Boolean(errors.username)}
+              helperText={touched.username && errors.username}
+              fullWidth
+            />
+            <TextField
+              name="password"
+              label="Password"
+              type="password"
+              variant="filled"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.password && Boolean(errors.password)}
+              helperText={touched.password && errors.password}
+              fullWidth
+            />
+            <Button type="submit" variant="contained" disabled={isSubmitting}>
+              Login
+            </Button>
+          </Box>
+        </Form>
+      )}
+    </Formik>
   );
 };
 
