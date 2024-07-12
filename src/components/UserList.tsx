@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { Box } from '@mui/material';
-import CustomButton from './StyledButton';
+import CustomButton from './CustomButton';
 
 export interface User {
   id: number;
