@@ -4,6 +4,8 @@ import './App.css';
 import UserList from './components/UserList';
 import Login from './components/Login';
 import PrivateRoute from './components/PrivateRoute';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
   return (
@@ -16,6 +18,7 @@ const App: React.FC = () => {
             <Route path="/login" element={<Login />} />
           </Routes>
         </header>
+        <ToastContainer />
       </div>
     </Router>
   );

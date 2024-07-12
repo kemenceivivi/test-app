@@ -23,25 +23,25 @@ export const useApi = (): Api => {
   const handleResponse = useCallback(
     async (response) => {
       if (!response.ok) {
-        let errorMessage = 'Network response was not ok';
+        let errorMessage = 'network response was not ok';
         try {
           const errorBody = await response.json();
-          errorMessage = errorBody.message;
+          errorMessage = errorBody.error || errorMessage;
         } catch (error) {
-          console.error('Failed to parse error response body:', error);
+          console.error(error);
         }
 
         switch (response.status) {
           case 401:
             clearTokens();
             navigate('/login');
-            errorMessage = 'Unauthorized:' + errorMessage;
+            errorMessage = 'Unauthorized: ' + errorMessage;
             break;
           case 404:
             errorMessage = 'Not Found: ' + errorMessage;
             break;
           case 500:
-            errorMessage = 'Internal Server Error:' + errorMessage;
+            errorMessage = 'Internal Server Error: ' + errorMessage;
             break;
           default:
             errorMessage = `[${response.status}] ${errorMessage}`;

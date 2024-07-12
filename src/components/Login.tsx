@@ -28,12 +28,13 @@ const Login: React.FC = () => {
         { username: string; password: string },
         { token: string; user: { id: number; name: string } }
       >('/api/login', { username, password });
-
       setToken(data.token);
+      console.log(data);
       login();
       navigate('/');
     } catch (error) {
       if (error instanceof Error) {
+        console.log('error:', error);
         toast.error(error.message);
       } else {
       }
